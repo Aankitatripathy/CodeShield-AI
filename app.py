@@ -1417,7 +1417,8 @@ if "scan_results" in st.session_state:
         y="Findings",
         x_label="Severity",
         y_label="Number of Findings",
-        horizontal=False,
+        horizontal=True,
+        height=280,
     )
 
     # --------------------------------------------------
