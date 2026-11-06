@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>CodeShield AI Security Assessment</title>
+
+<style>
+body {
+    font-family: Arial, sans-serif;
+    background: #f5f7fb;
+    color: #1d2939;
+    margin: 0;
+    line-height: 1.6;
+}
+
+header {
+    background: #14263e;
+    color: white;
+    padding: 36px 8%;
+}
+
+header h2 {
+    color: white;
+}
+
+main {
+    max-width: 1000px;
+    margin: 30px auto;
+    padding: 0 20px;
+}
+
+.summary, .finding {
+    background: white;
+    border: 1px solid #e1e5ed;
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 22px;
+}
+
+.summary span {
+    display: inline-block;
+    margin: 8px 14px 8px 0;
+    font-weight: bold;
+}
+
+.finding {
+    border-left: 5px solid #cc4052;
+}
+
+.finding-meta {
+    overflow-wrap: anywhere;
+}
+
+h2 {
+    color: #172c48;
+}
+
+h3 {
+    color: #243b53;
+    margin-top: 22px;
+}
+
+pre {
+    background: #101c2d;
+    color: #e6edf5;
+    padding: 16px;
+    overflow-x: auto;
+    border-radius: 8px;
+    font-size: 12px;
+    line-height: 1.6;
+    white-space: pre;
+    tab-size: 4;
+}
+
+.secure-fix {
+    margin-top: 24px;
+    padding-top: 12px;
+    border-top: 1px solid #d0d5dd;
+}
+
+.secure-fix h3 {
+    color: #087443;
+}
+
+.secure-fix pre {
+    background: #102a24;
+    color: #e4f6e9;
+    border-left: 4px solid #12a66a;
+}
+
+.code-note {
+    color: #667085;
+    font-size: 12px;
+    line-height: 1.6;
+}
+
+footer {
+    text-align: center;
+    padding: 25px;
+    color: #667085;
+}
+
+@media print {
+    body {
+        background: white;
+    }
+
+    header {
+        padding: 20px;
+    }
+
+    .summary, .finding {
+        box-shadow: none;
+        break-inside: auto;
+    }
+
+    pre {
+        white-space: pre-wrap;
+        overflow-wrap: anywhere;
+    }
+}
+</style>
+</head>
+
+<body>
+<header>
+    <h1>CodeShield AI</h1>
+    <h2>Security Assessment Report</h2>
+    <p>Generated: 2026-11-06 16:59:40</p>
+</header>
+
+<main>
+    <section class="summary">
+        <h2>Executive Summary</h2>
+
+        <p>
+            <strong>Application:</strong>
+            CDF-CyberSec-Hackathon-main.zip
+        </p>
+
+        <p>
+            <strong>Files scanned:</strong>
+            19
+        </p>
+
+        <p>
+            <strong>Potential findings:</strong>
+            6
+        </p>
+
+        <div><span>Critical: 0</span><span>High: 4</span><span>Medium: 2</span><span>Low: 0</span></div>
+
+        <p>
+            All findings require manual verification.
+        </p>
+    </section>
+
+    <h2>Detailed Security Findings</h2>
+
+    
+        <section class="finding">
+            <h2>1. Potential cross-site scripting (XSS)</h2>
+
+            <div class="finding-meta">
+                <p><strong>Severity:</strong> High</p>
+                <p><strong>File:</strong> CDF-CyberSec-Hackathon-main/vulnerable-app/src/components/TaskComments.tsx</p>
+                <p><strong>Line(s):</strong> 40</p>
+                <p><strong>Detection:</strong> Static Analysis</p>
+            </div>
+
+            <h3>Source Code Evidence</h3>
+            <pre><code>   35:           {comments.map((comment) =&gt; (
+   36:             &lt;div className=&quot;comment&quot; key={comment.id}&gt;
+   37:               &lt;strong&gt;{comment.author}&lt;/strong&gt;
+   38: 
+   39:               &lt;div
+&gt;&gt; 40:                 dangerouslySetInnerHTML={{
+   41:                   __html: comment.text,
+   42:                 }}
+   43:               /&gt;
+   44: 
+   45:               &lt;small&gt;{comment.createdAt}&lt;/small&gt;</code></pre>
+
+            <h3>Root Cause / Description</h3>
+            <p>Raw HTML rendering may allow cross-site scripting if attacker-controlled content reaches this location.</p>
+
+            <h3>Recommended Secure Fix</h3>
+            <p>Render untrusted content as plain text. If HTML is required, sanitize it with a trusted library such as DOMPurify.</p>
+
+            
+            <div class="secure-fix">
+                <h3>Suggested Secure Code Example</h3>
+                <pre><code>// React safely escapes text rendered in JSX.
+// Use this when comments should contain plain text.
+
+&lt;div className=&quot;comment-text&quot;&gt;
+  {comment.text}
+&lt;/div&gt;
+
+// If rich HTML is required, sanitize it with
+// a trusted, correctly configured HTML sanitizer.
+// Do not pass raw user input directly into
+// dangerouslySetInnerHTML.</code></pre>
+                <p class="code-note">
+                    Example only. Adapt and test this fix
+                    against the application's actual code,
+                    database schema, and authorization rules.
+                </p>
+            </div>
+            
+        </section>
+        
+        <section class="finding">
+            <h2>2. Potential missing authentication in privileged function</h2>
+
+            <div class="finding-meta">
+                <p><strong>Severity:</strong> High</p>
+                <p><strong>File:</strong> CDF-CyberSec-Hackathon-main/vulnerable-app/supabase/functions/get-profile/index.ts</p>
+                <p><strong>Line(s):</strong> 25</p>
+                <p><strong>Detection:</strong> Advanced Static Analysis</p>
+            </div>
+
+            <h3>Source Code Evidence</h3>
+            <pre><code>   20:       );
+   21:     }
+   22: 
+   23:     const supabase = createClient(
+   24:       Deno.env.get(&quot;SUPABASE_URL&quot;) ?? &quot;&quot;,
+&gt;&gt; 25:       Deno.env.get(&quot;SUPABASE_SERVICE_ROLE_KEY&quot;) ?? &quot;&quot;
+   26:     );
+   27: 
+   28:     const { data, error } = await supabase
+   29:       .from(&quot;profiles&quot;)
+   30:       .select(&quot;*&quot;)</code></pre>
+
+            <h3>Root Cause / Description</h3>
+            <p>This Supabase Edge Function references a service-role key but does not visibly validate the caller using auth.getUser() or auth.getClaims(). Service-role access can bypass Row Level Security. Other authentication mechanisms or deployment settings may exist, so verify them before confirming the vulnerability.</p>
+
+            <h3>Recommended Secure Fix</h3>
+            <p>Validate the caller&#x27;s JWT and verify permission to access the requested resource before performing privileged operations. Prefer a user-scoped Supabase client when possible.</p>
+
+            
+            <div class="secure-fix">
+                <h3>Suggested Secure Code Example</h3>
+                <pre><code>// Example for a Supabase Edge Function.
+// Use the public anon/publishable key with
+// the caller&#x27;s authorization header.
+
+const authHeader = req.headers.get(&quot;Authorization&quot;);
+
+if (!authHeader?.startsWith(&quot;Bearer &quot;)) {
+  return new Response(&quot;Unauthorized&quot;, {
+    status: 401,
+  });
+}
+
+const userClient = createClient(
+  Deno.env.get(&quot;SUPABASE_URL&quot;) ?? &quot;&quot;,
+  Deno.env.get(&quot;SUPABASE_ANON_KEY&quot;) ?? &quot;&quot;,
+  {
+    global: {
+      headers: {
+        Authorization: authHeader,
+      },
+    },
+  }
+);
+
+const token = authHeader.slice(7);
+
+const {
+  data: { user },
+  error: authError,
+} = await userClient.auth.getUser(token);
+
+if (authError || !user) {
+  return new Response(&quot;Unauthorized&quot;, {
+    status: 401,
+  });
+}
+
+// Prefer userClient for database operations,
+// so the caller&#x27;s Row Level Security applies.
+// For privileged operations, separately verify
+// ownership or permission before using a
+// service-role client.</code></pre>
+                <p class="code-note">
+                    Example only. Adapt and test this fix
+                    against the application's actual code,
+                    database schema, and authorization rules.
+                </p>
+            </div>
+            
+        </section>
+        
+        <section class="finding">
+            <h2>3. Potential SQL injection in dynamic query</h2>
+
+            <div class="finding-meta">
+                <p><strong>Severity:</strong> High</p>
+                <p><strong>File:</strong> CDF-CyberSec-Hackathon-main/vulnerable-app/supabase/functions/search-tasks/index.ts</p>
+                <p><strong>Line(s):</strong> 21, 23</p>
+                <p><strong>Detection:</strong> AI Analysis, Advanced Static Analysis</p>
+            </div>
+
+            <h3>Source Code Evidence</h3>
+            <pre><code>   16:     Deno.env.get(&quot;DATABASE_URL&quot;) ?? &quot;&quot;
+   17:   );
+   18: 
+   19:   try {
+   20:     const query = `
+&gt;&gt; 21:       SELECT id, title, description, status
+   22:       FROM public.tasks
+&gt;&gt; 23:       WHERE title ILIKE &#x27;%${searchTerm}%&#x27;
+   24:       ORDER BY created_at DESC
+   25:       LIMIT 25
+   26:     `;
+   27: 
+   28:     const tasks = await sql.unsafe(query);</code></pre>
+
+            <h3>Root Cause / Description</h3>
+            <p>A SQL template contains an interpolated expression, and a potentially unsafe database execution method appears nearby. If the interpolated value comes from untrusted input, SQL injection may be possible. Verify the data flow and execution call.</p>
+
+            <h3>Recommended Secure Fix</h3>
+            <p>Use parameterized SQL queries or a database client&#x27;s safe parameter-binding API. Avoid building SQL strings with untrusted input.</p>
+
+            
+            <div class="secure-fix">
+                <h3>Suggested Secure Code Example</h3>
+                <pre><code>// Example for a SQL client supporting
+// parameterized tagged-template queries.
+
+const searchPattern = `%${searchTerm}%`;
+
+const tasks = await sql`
+  SELECT id, title, description, status
+  FROM public.tasks
+  WHERE title ILIKE ${searchPattern}
+  ORDER BY created_at DESC
+  LIMIT 25
+`;
+
+// Verify that your SQL library parameterizes
+// expressions inside tagged templates.</code></pre>
+                <p class="code-note">
+                    Example only. Adapt and test this fix
+                    against the application's actual code,
+                    database schema, and authorization rules.
+                </p>
+            </div>
+            
+        </section>
+        
+        <section class="finding">
+            <h2>4. Potential missing authentication in privileged function</h2>
+
+            <div class="finding-meta">
+                <p><strong>Severity:</strong> High</p>
+                <p><strong>File:</strong> CDF-CyberSec-Hackathon-main/vulnerable-app/supabase/functions/update-task/index.ts</p>
+                <p><strong>Line(s):</strong> 33</p>
+                <p><strong>Detection:</strong> Advanced Static Analysis</p>
+            </div>
+
+            <h3>Source Code Evidence</h3>
+            <pre><code>   28:     const taskId = body.taskId;
+   29:     const changes = body.changes;
+   30: 
+   31:     const supabase = createClient(
+   32:       Deno.env.get(&quot;SUPABASE_URL&quot;) ?? &quot;&quot;,
+&gt;&gt; 33:       Deno.env.get(&quot;SUPABASE_SERVICE_ROLE_KEY&quot;) ?? &quot;&quot;
+   34:     );
+   35: 
+   36:     const { data, error } = await supabase
+   37:       .from(&quot;tasks&quot;)
+   38:       .update(changes)</code></pre>
+
+            <h3>Root Cause / Description</h3>
+            <p>This Supabase Edge Function references a service-role key but does not visibly validate the caller using auth.getUser() or auth.getClaims(). Service-role access can bypass Row Level Security. Other authentication mechanisms or deployment settings may exist, so verify them before confirming the vulnerability.</p>
+
+            <h3>Recommended Secure Fix</h3>
+            <p>Validate the caller&#x27;s JWT and verify permission to access the requested resource before performing privileged operations. Prefer a user-scoped Supabase client when possible.</p>
+
+            
+            <div class="secure-fix">
+                <h3>Suggested Secure Code Example</h3>
+                <pre><code>// Example for a Supabase Edge Function.
+// Use the public anon/publishable key with
+// the caller&#x27;s authorization header.
+
+const authHeader = req.headers.get(&quot;Authorization&quot;);
+
+if (!authHeader?.startsWith(&quot;Bearer &quot;)) {
+  return new Response(&quot;Unauthorized&quot;, {
+    status: 401,
+  });
+}
+
+const userClient = createClient(
+  Deno.env.get(&quot;SUPABASE_URL&quot;) ?? &quot;&quot;,
+  Deno.env.get(&quot;SUPABASE_ANON_KEY&quot;) ?? &quot;&quot;,
+  {
+    global: {
+      headers: {
+        Authorization: authHeader,
+      },
+    },
+  }
+);
+
+const token = authHeader.slice(7);
+
+const {
+  data: { user },
+  error: authError,
+} = await userClient.auth.getUser(token);
+
+if (authError || !user) {
+  return new Response(&quot;Unauthorized&quot;, {
+    status: 401,
+  });
+}
+
+// Prefer userClient for database operations,
+// so the caller&#x27;s Row Level Security applies.
+// For privileged operations, separately verify
+// ownership or permission before using a
+// service-role client.</code></pre>
+                <p class="code-note">
+                    Example only. Adapt and test this fix
+                    against the application's actual code,
+                    database schema, and authorization rules.
+                </p>
+            </div>
+            
+        </section>
+        
+        <section class="finding">
+            <h2>5. Potential overly permissive RLS policy</h2>
+
+            <div class="finding-meta">
+                <p><strong>Severity:</strong> Medium</p>
+                <p><strong>File:</strong> CDF-CyberSec-Hackathon-main/vulnerable-app/supabase/migrations/002_access_policies.sql</p>
+                <p><strong>Line(s):</strong> 13</p>
+                <p><strong>Detection:</strong> Advanced Static Analysis</p>
+            </div>
+
+            <h3>Source Code Evidence</h3>
+            <pre><code>   8: 
+   9: CREATE POLICY &quot;Users can view profiles&quot;
+   10: ON public.profiles
+   11: FOR SELECT
+   12: TO authenticated
+&gt;&gt; 13: USING (true);
+   14: 
+   15: CREATE POLICY &quot;Users can update own profile&quot;
+   16: ON public.profiles
+   17: FOR UPDATE
+   18: TO authenticated</code></pre>
+
+            <h3>Root Cause / Description</h3>
+            <p>This SELECT policy uses USING (true), allowing all rows to be selected by roles covered by the policy, subject to other database access controls. This may be intentional for shared data. Review whether the records contain private information. Policy operation: SELECT. Roles: authenticated. Table: public.profiles.</p>
+
+            <h3>Recommended Secure Fix</h3>
+            <p>For private records, restrict access using auth.uid(), ownership, membership, or role-based checks. For intentionally shared records, document the access requirements and verify other policies.</p>
+
+            
+            <div class="secure-fix">
+                <h3>Suggested Secure Code Example</h3>
+                <pre><code>-- Example: restrict access to owned records.
+-- Confirm the actual ownership column first.
+-- Review all other policies on this table.
+
+DROP POLICY IF EXISTS &quot;Users can view profiles&quot;
+ON public.profiles;
+
+CREATE POLICY &quot;Users can view profiles&quot;
+ON public.profiles
+FOR SELECT
+TO authenticated
+USING (owner_id = (SELECT auth.uid()));
+
+-- Replace owner_id with the correct column.
+-- For profiles, the owner column may be id.
+-- Do not change intentionally shared access.</code></pre>
+                <p class="code-note">
+                    Example only. Adapt and test this fix
+                    against the application's actual code,
+                    database schema, and authorization rules.
+                </p>
+            </div>
+            
+        </section>
+        
+        <section class="finding">
+            <h2>6. Potential overly permissive RLS policy</h2>
+
+            <div class="finding-meta">
+                <p><strong>Severity:</strong> Medium</p>
+                <p><strong>File:</strong> CDF-CyberSec-Hackathon-main/vulnerable-app/supabase/migrations/002_access_policies.sql</p>
+                <p><strong>Line(s):</strong> 38</p>
+                <p><strong>Detection:</strong> Advanced Static Analysis</p>
+            </div>
+
+            <h3>Source Code Evidence</h3>
+            <pre><code>   33: 
+   34: CREATE POLICY &quot;Users can view tasks&quot;
+   35: ON public.tasks
+   36: FOR SELECT
+   37: TO authenticated
+&gt;&gt; 38: USING (true);
+   39: 
+   40: CREATE POLICY &quot;Users can create tasks&quot;
+   41: ON public.tasks
+   42: FOR INSERT
+   43: TO authenticated</code></pre>
+
+            <h3>Root Cause / Description</h3>
+            <p>This SELECT policy uses USING (true), allowing all rows to be selected by roles covered by the policy, subject to other database access controls. This may be intentional for shared data. Review whether the records contain private information. Policy operation: SELECT. Roles: authenticated. Table: public.tasks.</p>
+
+            <h3>Recommended Secure Fix</h3>
+            <p>For private records, restrict access using auth.uid(), ownership, membership, or role-based checks. For intentionally shared records, document the access requirements and verify other policies.</p>
+
+            
+            <div class="secure-fix">
+                <h3>Suggested Secure Code Example</h3>
+                <pre><code>-- Example: restrict access to owned records.
+-- Confirm the actual ownership column first.
+-- Review all other policies on this table.
+
+DROP POLICY IF EXISTS &quot;Users can view tasks&quot;
+ON public.tasks;
+
+CREATE POLICY &quot;Users can view tasks&quot;
+ON public.tasks
+FOR SELECT
+TO authenticated
+USING (owner_id = (SELECT auth.uid()));
+
+-- Replace owner_id with the correct column.
+-- For profiles, the owner column may be id.
+-- Do not change intentionally shared access.</code></pre>
+                <p class="code-note">
+                    Example only. Adapt and test this fix
+                    against the application's actual code,
+                    database schema, and authorization rules.
+                </p>
+            </div>
+            
+        </section>
+        
+
+    <section class="summary">
+        <h2>Assessment Limitations</h2>
+        <p>
+            Static analysis and AI review may produce
+            false positives or miss vulnerabilities.
+            Suggested code examples require developer
+            review, adaptation, and testing.
+        </p>
+    </section>
+</main>
+
+<footer>
+    CodeShield AI | CDF CyberSec Hackathon
+</footer>
+</body>
+</html>
